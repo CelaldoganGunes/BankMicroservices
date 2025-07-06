@@ -9,12 +9,15 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String accountNumber;      // “TR00…” vb.
-    private String accountType;        // CHECKING | SAVINGS
-    private Double balance;
-    private Long userId;               // User microservice’ten gelecek
+    private String accountNumber;
 
-    /* getters-setters + boş constructor */
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
+
+    private Double balance;
+
+    private Long userId;
+
     public BankAccount() {}
 
     public Long getId() {
@@ -33,11 +36,11 @@ public class BankAccount {
         this.accountNumber = accountNumber;
     }
 
-    public String getAccountType() {
+    public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(String accountType) {
+    public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
 
