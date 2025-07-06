@@ -65,4 +65,10 @@ public class AccountController {
         return ResponseEntity.ok("celal başkan");
     }
 
+    @DeleteMapping("/reset")
+    public ResponseEntity<String> resetDatabase() {
+        service.resetDatabase();
+        return ResponseEntity.ok("Veritabanı sıfırlandı");
+    }
+
 }

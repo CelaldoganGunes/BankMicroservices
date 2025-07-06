@@ -5,6 +5,7 @@ import com.example.accountmicroservice.entity.Transaction;
 import com.example.accountmicroservice.repository.BankAccountRepository;
 import com.example.accountmicroservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
@@ -15,9 +16,12 @@ public class AccountService {
 
     private final TransactionRepository transactionRepo;
 
-    public AccountService(BankAccountRepository repo, TransactionRepository transactionRepo) {
+    private final JdbcTemplate jdbcTemplate;
+
+    public AccountService(BankAccountRepository repo, TransactionRepository transactionRepo, JdbcTemplate jdbcTemplate) {
         this.repo = repo;
         this.transactionRepo = transactionRepo;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public BankAccount createAccount(BankAccount acc) {
@@ -116,5 +120,10 @@ public class AccountService {
 
     public List<Transaction> getTransactions(Long accountId) {
         return transactionRepo.findByAccountId(accountId);
+    }
+
+    public void resetDatabase() {
+        jdbcTemplate.execute("TRUNCATE TABLE transaction");
+        jdbcTemplate.execute("TRUNCATE TABLE bank_account");
     }
 }
