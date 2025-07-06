@@ -2,6 +2,7 @@ package com.example.accountmicroservice.controller;
 
 import com.example.accountmicroservice.dto.BalanceRequest;
 import com.example.accountmicroservice.entity.BankAccount;
+import com.example.accountmicroservice.entity.Transaction;
 import com.example.accountmicroservice.service.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,11 @@ public class AccountController {
     @GetMapping("/{id}")
     public ResponseEntity<BankAccount> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getAccountById(id));
+    }
+
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<List<Transaction>> getTransactions(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getTransactions(id));
     }
 
     @PatchMapping("/{id}/balance")
@@ -48,7 +54,7 @@ public class AccountController {
         service.transfer(fromId, toId, request.getAmount());
         return ResponseEntity.ok("Transfer başarılı");
     }
-    
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteAccount(id);
@@ -58,4 +64,5 @@ public class AccountController {
     public ResponseEntity<String> byCelal() {
         return ResponseEntity.ok("celal başkan");
     }
+
 }

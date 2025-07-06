@@ -1,7 +1,9 @@
 package com.example.accountmicroservice.service;
 
 import com.example.accountmicroservice.entity.BankAccount;
+import com.example.accountmicroservice.entity.Transaction;
 import com.example.accountmicroservice.repository.BankAccountRepository;
+import com.example.accountmicroservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +13,11 @@ public class AccountService {
 
     private final BankAccountRepository repo;
 
-    public AccountService(BankAccountRepository repo) {
+    private final TransactionRepository transactionRepo;
+
+    public AccountService(BankAccountRepository repo, TransactionRepository transactionRepo) {
         this.repo = repo;
+        this.transactionRepo = transactionRepo;
     }
 
     public BankAccount createAccount(BankAccount acc) {
@@ -42,7 +47,15 @@ public class AccountService {
         }
 
         account.setBalance(newBalance);
-        return repo.save(account);
+        repo.save(account);
+
+        Transaction tx = new Transaction();
+        tx.setAccountId(account.getId());
+        tx.setAmount(amount);
+        tx.setType(amount > 0 ? "DEPOSIT" : "WITHDRAW");
+        transactionRepo.save(tx);
+
+        return account;
     }
 
     public void transfer(Long fromId, Long toId, Double amount) {
@@ -62,10 +75,25 @@ public class AccountService {
 
         from.setBalance(from.getBalance() - amount);
         to.setBalance(to.getBalance() + amount);
-
         repo.save(from);
         repo.save(to);
+
+        // Transfer kayıtları
+        Transaction outTx = new Transaction();
+        outTx.setAccountId(from.getId());
+        outTx.setAmount(-amount);
+        outTx.setType("TRANSFER_OUT");
+        outTx.setTargetAccountId(to.getId());
+        transactionRepo.save(outTx);
+
+        Transaction inTx = new Transaction();
+        inTx.setAccountId(to.getId());
+        inTx.setAmount(amount);
+        inTx.setType("TRANSFER_IN");
+        inTx.setTargetAccountId(from.getId());
+        transactionRepo.save(inTx);
     }
+
 
 
     public void deleteAccount(Long id) {
@@ -78,5 +106,11 @@ public class AccountService {
             accountNumber = "TR" + (long)(Math.random() * 1_000_000_000_000_000L);
         } while (repo.existsByAccountNumber(accountNumber));
         return accountNumber;
+    }
+
+    // TRANSACTIONS
+
+    public List<Transaction> getTransactions(Long accountId) {
+        return transactionRepo.findByAccountId(accountId);
     }
 }
