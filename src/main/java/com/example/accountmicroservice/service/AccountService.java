@@ -32,6 +32,19 @@ public class AccountService {
                 .orElseThrow(() -> new RuntimeException("Hesap bulunamadı: " + id));
     }
 
+    public BankAccount updateBalance(Long id, Double amount) {
+        BankAccount account = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hesap bulunamadı: " + id));
+
+        double newBalance = account.getBalance() + amount;
+        if (newBalance < 0) {
+            throw new RuntimeException("Yetersiz bakiye: " + account.getBalance());
+        }
+
+        account.setBalance(newBalance);
+        return repo.save(account);
+    }
+
     public void deleteAccount(Long id) {
         repo.deleteById(id);
     }

@@ -1,5 +1,6 @@
 package com.example.accountmicroservice.controller;
 
+import com.example.accountmicroservice.dto.BalanceRequest;
 import com.example.accountmicroservice.entity.BankAccount;
 import com.example.accountmicroservice.service.AccountService;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,13 @@ public class AccountController {
     @GetMapping("/{id}")
     public ResponseEntity<BankAccount> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getAccountById(id));
+    }
+
+    @PatchMapping("/{id}/balance")
+    public ResponseEntity<BankAccount> updateBalance(
+            @PathVariable Long id,
+            @RequestBody BalanceRequest request) {
+        return ResponseEntity.ok(service.updateBalance(id, request.getAmount()));
     }
 
     @PostMapping("/create")
