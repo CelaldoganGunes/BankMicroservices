@@ -16,7 +16,10 @@ public class AccountService {
     }
 
     public BankAccount createAccount(BankAccount acc) {
-        acc.setBalance(0.0);                 // ilk bakiye
+        acc.setBalance(0.0);
+        if (acc.getAccountNumber() == null || acc.getAccountNumber().isEmpty()) {
+            acc.setAccountNumber(generateUniqueAccountNumber());
+        }
         return repo.save(acc);
     }
 
@@ -26,5 +29,13 @@ public class AccountService {
 
     public void deleteAccount(Long id) {
         repo.deleteById(id);
+    }
+
+    private String generateUniqueAccountNumber() {
+        String accountNumber;
+        do {
+            accountNumber = "TR" + (long)(Math.random() * 1_000_000_000_000_000L);
+        } while (repo.existsByAccountNumber(accountNumber));
+        return accountNumber;
     }
 }
