@@ -17,6 +17,11 @@ public class AccountController {
         this.service = service;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BankAccount> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getAccountById(id));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<BankAccount> create(@RequestBody BankAccount acc) {
         return ResponseEntity.ok(service.createAccount(acc));
@@ -26,6 +31,8 @@ public class AccountController {
     public ResponseEntity<List<BankAccount>> byUser(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getAccountsByUser(userId));
     }
+
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

@@ -27,6 +27,11 @@ public class AccountService {
         return repo.findByUserId(userId);
     }
 
+    public BankAccount getAccountById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hesap bulunamadı: " + id));
+    }
+
     public void deleteAccount(Long id) {
         repo.deleteById(id);
     }
