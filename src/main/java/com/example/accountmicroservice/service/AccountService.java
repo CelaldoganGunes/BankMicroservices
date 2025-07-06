@@ -59,6 +59,10 @@ public class AccountService {
     }
 
     public void transfer(Long fromId, Long toId, Double amount) {
+        if (amount <= 0) {
+            throw new RuntimeException("Transfer miktarı pozitif olmalıdır. Girilen: " + amount);
+        }
+
         BankAccount from = repo.findById(fromId)
                 .orElseThrow(() -> new RuntimeException("Gönderen hesap bulunamadı: " + fromId));
         BankAccount to = repo.findById(toId)
@@ -78,7 +82,7 @@ public class AccountService {
         repo.save(from);
         repo.save(to);
 
-        // Transfer kayıtları
+        // Transfer hareketleri
         Transaction outTx = new Transaction();
         outTx.setAccountId(from.getId());
         outTx.setAmount(-amount);
