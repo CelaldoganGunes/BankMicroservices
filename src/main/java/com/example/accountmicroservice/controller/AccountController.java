@@ -40,8 +40,15 @@ public class AccountController {
         return ResponseEntity.ok(service.getAccountsByUser(userId));
     }
 
-
-
+    @PostMapping("/from/{fromId}/to/{toId}")
+    public ResponseEntity<String> transfer(
+            @PathVariable Long fromId,
+            @PathVariable Long toId,
+            @RequestBody BalanceRequest request) {
+        service.transfer(fromId, toId, request.getAmount());
+        return ResponseEntity.ok("Transfer başarılı");
+    }
+    
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteAccount(id);

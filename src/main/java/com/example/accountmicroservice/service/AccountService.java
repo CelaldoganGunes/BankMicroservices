@@ -45,6 +45,29 @@ public class AccountService {
         return repo.save(account);
     }
 
+    public void transfer(Long fromId, Long toId, Double amount) {
+        BankAccount from = repo.findById(fromId)
+                .orElseThrow(() -> new RuntimeException("Gönderen hesap bulunamadı: " + fromId));
+        BankAccount to = repo.findById(toId)
+                .orElseThrow(() -> new RuntimeException("Alıcı hesap bulunamadı: " + toId));
+
+        if (!from.getCurrency().equals(to.getCurrency())) {
+            throw new RuntimeException("Para birimleri uyumsuz! Gönderen: "
+                    + from.getCurrency() + ", Alıcı: " + to.getCurrency());
+        }
+
+        if (from.getBalance() < amount) {
+            throw new RuntimeException("Yetersiz bakiye: " + from.getBalance());
+        }
+
+        from.setBalance(from.getBalance() - amount);
+        to.setBalance(to.getBalance() + amount);
+
+        repo.save(from);
+        repo.save(to);
+    }
+
+
     public void deleteAccount(Long id) {
         repo.deleteById(id);
     }
