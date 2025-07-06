@@ -47,8 +47,8 @@ curl -X PATCH http://localhost:8082/api/accounts/1/balance \
   -d '{"amount":500}'
 echo
 
-echo "🚀 ID=1 hesaptan ID=2 hesaba 200 TL transfer ediliyor..."
-curl -X POST http://localhost:8082/api/accounts/from/1/to/2 \
+echo "🚀 ID=1 hesaptan ID=3 hesaba 200 TL transfer ediliyor..."
+curl -X POST http://localhost:8082/api/accounts/from/1/to/3 \
   -H "Content-Type: application/json" \
   -d '{"amount":200}'
 echo

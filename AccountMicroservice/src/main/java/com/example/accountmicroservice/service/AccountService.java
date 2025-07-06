@@ -4,10 +4,14 @@ import com.example.accountmicroservice.entity.BankAccount;
 import com.example.accountmicroservice.entity.Transaction;
 import com.example.accountmicroservice.repository.BankAccountRepository;
 import com.example.accountmicroservice.repository.TransactionRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AccountService {
@@ -17,11 +21,14 @@ public class AccountService {
     private final TransactionRepository transactionRepo;
 
     private final JdbcTemplate jdbcTemplate;
+    private final RestTemplate restTemplate;
+    private final String notificationUrl = "http://localhost:8083/api/notifications/send";
 
-    public AccountService(BankAccountRepository repo, TransactionRepository transactionRepo, JdbcTemplate jdbcTemplate) {
+    public AccountService(BankAccountRepository repo, TransactionRepository transactionRepo, JdbcTemplate jdbcTemplate, RestTemplate restTemplate) {
         this.repo = repo;
         this.transactionRepo = transactionRepo;
         this.jdbcTemplate = jdbcTemplate;
+        this.restTemplate = restTemplate;
     }
 
     public BankAccount createAccount(BankAccount acc) {
@@ -58,7 +65,7 @@ public class AccountService {
         tx.setAmount(amount);
         tx.setType(amount > 0 ? "DEPOSIT" : "WITHDRAW");
         transactionRepo.save(tx);
-
+        sendNotification(account.getUserId(), account.getId(), amount);
         return account;
     }
 
@@ -100,6 +107,8 @@ public class AccountService {
         inTx.setType("TRANSFER_IN");
         inTx.setTargetAccountId(from.getId());
         transactionRepo.save(inTx);
+        sendNotification(from.getUserId(), from.getId(), -amount);
+        sendNotification(to.getUserId(), to.getId(), amount);
     }
 
 
@@ -125,5 +134,21 @@ public class AccountService {
     public void resetDatabase() {
         jdbcTemplate.execute("TRUNCATE TABLE transaction");
         jdbcTemplate.execute("TRUNCATE TABLE bank_account");
+    }
+
+    private void sendNotification(Long userId, Long accountId, Double amount) {
+        String email = "user"+userId+"@mail.com"; // Simülasyon
+        String message = "Hesabınız ("+accountId+") için işlem gerçekleşti: " + amount;
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("email", email);
+        payload.put("message", message);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                notificationUrl,
+                payload,
+                String.class);
+
+        System.out.println("Notification gönderildi: " + response.getBody());
     }
 }
